@@ -16,6 +16,7 @@ def compute_balances(group: Group) -> dict[str, int]:
     balances = {member: 0 for member in group.members}
     for expense in group.expenses:
         balances[expense.payer] += expense.amount
-        for person, share in split_equally(expense.amount, expense.participants).items():
+        shares = split_equally(expense.amount, expense.participants, payer=expense.payer)
+        for person, share in shares.items():
             balances[person] -= share
     return balances
