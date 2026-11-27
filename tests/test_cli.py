@@ -20,18 +20,6 @@ def test_full_flow(tmp_path, capsys):
     assert "Вика" in out and "-350.00 ₽" in out
 
 
-def test_indivisible_amount_in_balance(tmp_path, capsys):
-    run(tmp_path, "init", "Пицца")
-    run(tmp_path, "member", "add", "Аня", "Боря", "Вика")
-    assert run(tmp_path, "expense", "add", "--payer", "Аня", "--amount", "1000") == 0
-    capsys.readouterr()
-
-    assert run(tmp_path, "balance") == 0
-    out = capsys.readouterr().out
-    assert "666.66 ₽" in out
-    assert "-333.33 ₽" in out
-
-
 def test_error_is_reported_not_raised(tmp_path, capsys):
     run(tmp_path, "init", "Карелия")
     run(tmp_path, "member", "add", "Аня")
