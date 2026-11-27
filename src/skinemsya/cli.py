@@ -7,6 +7,7 @@
     skinemsya expense add --payer Боря --amount 600 --for Боря,Гоша,Дима --desc "Баня"
     skinemsya expenses
     skinemsya balance
+    skinemsya settle
 """
 
 from __future__ import annotations
@@ -18,6 +19,7 @@ from pathlib import Path
 from .balance import compute_balances
 from .models import DomainError, Group
 from .money import format_rub, parse_rub
+from .settle import settle
 from .storage import DEFAULT_FILE, load_group, save_group
 
 
@@ -78,6 +80,16 @@ def _cmd_balance(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_settle(args: argparse.Namespace) -> int:
+    transfers = settle(load_group(args.file))
+    if not transfers:
+        print("Переводы не нужны.")
+        return 0
+    for transfer in transfers:
+        print(f"{transfer.debtor} → {transfer.creditor}  {format_rub(transfer.amount)}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="skinemsya", description="Делим общие траты без боли.")
     parser.add_argument(
@@ -112,6 +124,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_balance = sub.add_parser("balance", help="кто кому сколько должен (балансы)")
     p_balance.set_defaults(func=_cmd_balance)
+
+    p_settle = sub.add_parser("settle", help="план переводов: кто кому сколько переводит")
+    p_settle.set_defaults(func=_cmd_settle)
 
     return parser
 

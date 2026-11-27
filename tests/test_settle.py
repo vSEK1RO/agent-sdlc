@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
 
 import pytest
-from hypothesis import assume, given, strategies as st
+from hypothesis import assume, given
+from hypothesis import strategies as st
 
 from skinemsya.cli import main
 from skinemsya.models import Group
@@ -32,7 +33,7 @@ def _oracle_minimum(balances: dict[str, int]) -> int:
     if not values:
         return 0
 
-    @lru_cache(maxsize=None)
+    @cache
     def search(state: tuple[int, ...]) -> int:
         i = next((index for index, value in enumerate(state) if value), None)
         if i is None:
@@ -59,7 +60,7 @@ def balanced_balances(draw):
     )
     last = -sum(values)
     assume(-6 <= last <= 6)
-    return dict(zip(names, [*values, last]))
+    return dict(zip(names, [*values, last], strict=True))
 
 
 # --- Сценарии из спеки ---------------------------------------------------
